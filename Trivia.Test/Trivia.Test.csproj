@@ -16,4 +16,9 @@
     <ProjectReference Include="..\Trivia\Trivia.csproj" />
   </ItemGroup>
 
+  <ItemGroup>
+    <Folder Include="GoldenMasterOutputs\" />
+    <Folder Include="ExecutionOutputs\" />
+  </ItemGroup>
+
 </Project>

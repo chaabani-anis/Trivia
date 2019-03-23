@@ -9,38 +9,41 @@ namespace Trivia.Test
 {
     
     [TestClass]
-    public class GoldenMasterTest //: IDisposable
+    public class GoldenMasterTest
     {
-        private readonly TextWriter _originalOut;
-        private const string ActualOutput = "output.txt";
-        private const string GoldenMaster = "../../../golden.txt";
+        private const string GoldenMasterPath = "../../../GoldenMasterOutputs/";
+        private const string ExecutionPath = "../../../ExecutionOutputs/";
 
         public GoldenMasterTest()
         {
-            _originalOut = Console.Out;
+            RemoveExecutionFiles();
+        }
+
+        private static void RemoveExecutionFiles()
+        {
+            string[] filePaths = Directory.GetFiles(ExecutionPath);
+            foreach (string filePath in filePaths)
+                File.Delete(filePath);
         }
 
         [TestMethod]
-        public void golden_master()
+        public void Should_Current_Output_Matches_Golden_master()
         {
-            RunTheProgram(seed: 99, outputFile: ActualOutput, times: 1000);
-
-            var actual = File.ReadAllText(ActualOutput);
-            var goldenMaster = File.ReadAllText(GoldenMaster);
-            Assert.AreEqual(goldenMaster, actual);
-           
-            
+            foreach (var seed in Enumerable.Range(0, 1000))
+            {
+                RunTheProgram(seed, ExecutionPath);
+                var actual = File.ReadAllText(ExecutionPath + "output_" + seed.ToString() + ".txt");
+                var goldenMaster = File.ReadAllText(GoldenMasterPath + "output_" + seed.ToString() + ".txt");
+                Assert.AreEqual(goldenMaster, actual);
+            }
         }
 
-        private static void RunTheProgram(int seed, string outputFile, int times)
+        private static void RunTheProgram(int seed, string outputFile)
         {
-            using (var writer = File.CreateText(outputFile))
+            using (var writer = File.CreateText(outputFile + "output_" + seed.ToString() + ".txt"))
             {
                 Console.SetOut(writer);
-                foreach (var i in Enumerable.Range(0, times))
-                {
-                    GameRunner.Play(new Random(seed));
-                }
+                GameRunner.Play(new Random(seed));
             }
         }
     }
